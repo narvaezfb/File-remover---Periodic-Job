@@ -72,15 +72,47 @@ def GetDuplicateFiles(folderPath: str) -> list:
 
 # Function to check if a list of files contains duplicates
 
+# checks for length of duplicates
+
 
 def hasDuplicates(files: list) -> bool:
     return len(files) > 0
+
+# checks for valid integer
 
 
 def validateInt(number: str) -> bool:
     return number.isnumeric()
 
+# removes leading slash from string
+
+
+def removeLeadingSlash(folderPath: str) -> str:
+    if folderPath and folderPath[0] == "/":
+        return folderPath[1:]
+    return folderPath
+
+# converts time to seconds and return the result
+
 
 def convertTimeToSeconds(hours: int, minutes: int, seconds: int) -> int:
     totalSeconds = (hours * 3600) + (minutes * 60) + seconds
     return totalSeconds
+
+# validate hours
+
+
+def isValidHours(hours: int) -> bool:
+    return hours >= 0
+
+# validate minutes
+
+
+def isValidMinutes(minutes: int) -> bool:
+    return 0 <= minutes <= 60
+
+# validate seconds
+
+
+def isValidSeconds(seconds: int) -> bool:
+    return 10 <= seconds <= 60

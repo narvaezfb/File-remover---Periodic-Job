@@ -4,27 +4,38 @@ import sys
 from utilities.functions import *
 
 logging.basicConfig(level=logging.INFO)
-
+ENTER_DIRECTORY_MESSAGE = "\nPlease enter directory path: "
+PATH_NOT_FOUND_MESSAGE = "Path does not exists, please try again!"
+ENTER_HOURS_MESSAGE = "\nPlease enter the number of hours: "
+ENTER_MINUTES_MESSAGE = "Please enter the number of minutes: "
+ENTER_SECONDS_MESSAGE = "Please enter the number of seconds: "
+CONTINUE_MESSAGE = "\nDo you want to continue? \nyes/no: "
+EXIT_COMMAND_MESSAGE = f"\nCntrl + C to exit "
+EXIT_TASK_MESSAGE = f"\nCntrl + C to finish the periodic job! "
+ERROR_HOURS_MESSAGE = "hours can't be negative, please try again!"
+ERROR_MINUTES_MESSAGE = "minutes must be between 1 and 60, please try again!"
+ERROR_SECONDS_MESSAGE = "seconds must be between 1 and 60, please try again!"
+ERROR_NUMBER_MESSAGE = "Invalid value, please try again!"
 # User Interactions
 
 
 def ReceiveFolderPath() -> str:
     while True:
         try:
-            folderPath = input(
-                "\nPlease enter directory path: ")
+            folderPath = removeLeadingSlash(input(ENTER_DIRECTORY_MESSAGE))
             if DoesFolderExists(folderPath):
                 return folderPath
             else:
-                logging.error("Path does not exists, please try again!")
-        except FileNotFoundError:
-            logging.error("Path does not exists, please try again!")
+                logging.error(PATH_NOT_FOUND_MESSAGE)
+        except KeyboardInterrupt:
+            logging.info("User interrupted. Exiting.")
+            sys.exit()
 
 
 def GetTimeInfo() -> dict:
-    hours = GetIntFromUser("\nPlease enter the number of hours: ")
-    minutes = GetIntFromUser("Please enter the number of minutes: ")
-    seconds = GetIntFromUser("Please enter the number of seconds: ")
+    hours = GetIntFromUser(ENTER_HOURS_MESSAGE, "hours")
+    minutes = GetIntFromUser(ENTER_MINUTES_MESSAGE, "minutes")
+    seconds = GetIntFromUser(ENTER_SECONDS_MESSAGE, "seconds")
 
     timeInfo = {
         "hours": hours,
@@ -32,21 +43,6 @@ def GetTimeInfo() -> dict:
         "seconds": seconds
     }
     return timeInfo
-
-
-def IsByDays(input: str):
-    return input == "1"
-
-
-def GetDaysOrTime() -> str:
-    validOptions = ["1", "2"]
-    while True:
-        answer = input(
-            "\n- Enter 1 to schedule this task for days\n- Enter 2 to schedule this task for given time\nanswer:")
-        if answer in validOptions:
-            return answer
-        else:
-            logging.error("\nOnly 1 or 2 inputs are allowed, try again")
 
 
 def DisplayFilesToDelete(files: list) -> None:
@@ -60,8 +56,7 @@ def ConfirmDelete(input: str) -> bool:
 
 
 def AskForConfirmation() -> str:
-    userConfirmation = input(
-        "\nDo you want to continue? \nyes/no: ")
+    userConfirmation = input(CONTINUE_MESSAGE)
     return userConfirmation
 
 
@@ -80,11 +75,11 @@ def DisplayInfoEntered(folderPath, hours, minutes, seconds) -> None:
 
 
 def DisplayExitCommand():
-    logging.info(f"\nCntrl + C to exit ")
+    logging.info(EXIT_COMMAND_MESSAGE)
 
 
 def DisplayExitTask():
-    logging.info(f"\nCntrl + C to finish the periodic job! ")
+    logging.info(EXIT_TASK_MESSAGE)
 
 
 def clear_console():
@@ -94,10 +89,25 @@ def clear_console():
         os.system('clear')
 
 
-def GetIntFromUser(text: str) -> int:
+def GetIntFromUser(text: str, time: str) -> int:
     while True:
         number = input(text)
         if validateInt(number):
-            return int(number)
+            number = int(number)
+            if time == "hours":
+                if isValidHours(number):
+                    return number
+                else:
+                    logging.error(ERROR_HOURS_MESSAGE)
+            elif time == "minutes":
+                if isValidMinutes(number):
+                    return number
+                else:
+                    logging.error(ERROR_MINUTES_MESSAGE)
+            elif time == "seconds":
+                if isValidSeconds(number):
+                    return number
+                else:
+                    logging.error(ERROR_SECONDS_MESSAGE)
         else:
-            logging.error("Invalid value, please try again!")
+            logging.error(ERROR_NUMBER_MESSAGE)
